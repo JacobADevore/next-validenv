@@ -94,8 +94,6 @@ import { env } from "./env.mjs";
 env.NODE_ENV; // Typesafe environment variables
 ```
 
-<br />
-
 ---
 
 ## Manual Implementation
