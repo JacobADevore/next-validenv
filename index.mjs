@@ -1,6 +1,7 @@
 // @ts-check
 
-export const mapProcessEnvToObject = (
+// maps through zod schema keys and returns an object with the safeParse values from process.env[key]
+export const mapEnvironmentVariablesToObject = (
   /** @type {import('zod').ZodObject} */ schema
 ) => {
   /** @type {{ [key: string]: string | undefined; }} */
@@ -28,9 +29,10 @@ export const validateEnvironmentVariables = (
   /** @type {import('zod').ZodObject} */ clientSchema,
   /** @type {import('zod').ZodObject} */ serverSchema
 ) => {
-  let serverEnv = mapProcessEnvToObject(serverSchema);
-  let clientEnv = mapProcessEnvToObject(clientSchema);
+  let serverEnv = mapEnvironmentVariablesToObject(serverSchema);
+  let clientEnv = mapEnvironmentVariablesToObject(clientSchema);
 
+  // holds not set environment variable errors for both client and server
   let invalidEnvErrors = [];
 
   if (!serverEnv.success) {
@@ -47,11 +49,13 @@ export const validateEnvironmentVariables = (
     ];
   }
 
+  // if one or more environment variables are not set, throw an error
   if (!serverEnv.success || !clientEnv.success) {
     console.error("❌ Invalid environment variables:\n", ...invalidEnvErrors);
     throw new Error("Invalid environment variables");
   }
 
+  // holds server environment variables errors that are exposed to the client
   let exposedServerEnvErrors = [];
 
   for (let key of Object.keys(serverEnv.data)) {
@@ -60,6 +64,7 @@ export const validateEnvironmentVariables = (
     }
   }
 
+  // if one or more server environment variables are exposed to the client, throw an error
   if (exposedServerEnvErrors.length > 0) {
     console.error(
       "❌ You are exposing the following server-side environment variables to the client:\n",
@@ -70,6 +75,7 @@ export const validateEnvironmentVariables = (
     );
   }
 
+  // holds client environment variables errors that are not exposed to the client
   let notExposedClientEnvErrors = [];
 
   for (let key of Object.keys(clientEnv.data)) {
@@ -78,6 +84,7 @@ export const validateEnvironmentVariables = (
     }
   }
 
+  // if one or more client environment variables are not exposed to the client, throw an error
   if (notExposedClientEnvErrors.length > 0) {
     console.error(
       "❌ All client-side environment variables must begin with 'NEXT_PUBLIC_', you are not exposing the following:\n",
@@ -88,5 +95,6 @@ export const validateEnvironmentVariables = (
     );
   }
 
+  // return both client and server environment variables
   return { ...serverEnv.data, ...clientEnv.data };
 };
