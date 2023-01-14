@@ -1,0 +1,41 @@
+{
+  "name": "next-validenv",
+  "version": "1.0.0",
+  "author": "Jacob Devore <jacob@blient.com>",
+  "description": "Environment variable validation for Next.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JacobADevore/next-validenv.git"
+  },
+  "keywords": [
+    "react",
+    "nodejs",
+    "web",
+    "nextjs",
+    "next-validenv",
+    "env",
+    "env-validation",
+    "zod",
+    "typescript"
+  ],
+  "type": "module",
+  "main": "./index.mjs",
+  "scripts": {
+    "lint": "eslint ./index.mjs --report-unused-disable-directives",
+    "format": "prettier --write --plugin-search-dir=. **/*.{mjs,md,json} --ignore-path ../.gitignore",
+    "format:check": "prettier --check --plugin-search-dir=. **/*.{mjs,md,json} --ignore-path ../.gitignore",
+    "pub:beta": "npm publish --tag beta",
+    "pub:next": "npm publish --tag next",
+    "pub:release": "npm publish"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "eslint": "^8.31.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.2",
+    "typescript": "^4.9.4",
+    "zod": "^3.20.2"
+  }
+}
