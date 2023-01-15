@@ -5,6 +5,7 @@ import { z } from "zod";
  * Specify your server-side environment variables schema here.
  * This way you can ensure the app isn't built with invalid env vars.
  */
+/** @type {ReturnType<typeof z.object>} */
 export const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]),
 });
@@ -14,6 +15,7 @@ export const serverSchema = z.object({
  * This way you can ensure the app isn't built with invalid env vars.
  * To expose them to the client, prefix them with `NEXT_PUBLIC_`.
  */
+/** @type {ReturnType<typeof z.object>} */
 export const clientSchema = z.object({
   NEXT_PUBLIC_TEST: z.string(),
 });
