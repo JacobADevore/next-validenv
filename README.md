@@ -36,7 +36,7 @@ pnpm add zod next-validenv          # pnpm
 ### First, create `env.mjs`
 
 ```js
-// @ts-check
+//@ts-check
 import { validateEnvironmentVariables } from "next-validenv";
 import { z } from "zod";
 
@@ -54,15 +54,10 @@ export const serverSchema = z.object({
  * To expose them to the client, prefix them with `NEXT_PUBLIC_`.
  */
 export const clientSchema = z.object({
-  // NEXT_PUBLIC_CLIENT: z.string(),
+  // NEXT_PUBLIC_TEST: z.string(),
 });
 
-const environmentVariables = validateEnvironmentVariables(
-  clientSchema,
-  serverSchema
-);
-
-export const env = environmentVariables;
+export const env = validateEnvironmentVariables(serverSchema, clientSchema);
 ```
 
 ### Update ~~`next.config.js`~~ to `next.config.mjs`

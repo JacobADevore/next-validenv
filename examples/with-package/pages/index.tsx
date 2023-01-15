@@ -24,6 +24,7 @@ export default function Home() {
             <a
               href="https://github.com/JacobADevore/next-validenv"
               target="_blank"
+              rel="noreferrer"
               className="text-blue-400 hover:underline"
             >
               View Code
@@ -31,6 +32,7 @@ export default function Home() {
             <a
               href="https://twitter.com/JacobADevore"
               target="_blank"
+              rel="noreferrer"
               className="text-blue-400 hover:underline"
             >
               Twitter
