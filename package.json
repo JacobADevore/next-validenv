@@ -1,6 +1,6 @@
 {
   "name": "next-validenv",
-  "version": "1.1.0",
+  "version": "1.1.4",
   "author": "Jacob Devore <jacob@blient.com>",
   "description": "Typesafe environment variables for Next.js",
   "license": "MIT",
@@ -20,7 +20,19 @@
     "typescript"
   ],
   "type": "module",
+  "files": [
+    "/dist"
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
   "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
     "lint": "eslint ./index.mjs --report-unused-disable-directives",
@@ -29,12 +41,15 @@
     "pub:beta": "npm publish --tag beta",
     "pub:next": "npm publish --tag next",
     "pub:release": "npm publish",
-    "build": "rollup --config rollup.config.js"
+    "build": "rollup --config rollup.config.js",
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/node": "^18.11.18",
-    "eslint": "^8.31.0",
+    "@typescript-eslint/eslint-plugin": "^5.48.1",
+    "@typescript-eslint/parser": "^5.48.1",
+    "eslint": "^8.32.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.2",

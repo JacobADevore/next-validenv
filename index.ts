@@ -1,11 +1,9 @@
 import { z } from "zod";
 
 // maps through zod schema keys and returns an object with the safeParse values from process.env[key]
-export const mapEnvironmentVariablesToObject = <
-  T extends ReturnType<typeof z.object>
->(
-  schema: T
-): z.infer<T> => {
+export const mapEnvironmentVariablesToObject = (
+  schema: ReturnType<typeof z.object>
+) => {
   let env: { [key: string]: string | undefined } = {};
 
   Object.keys(schema.shape).forEach((key) => (env[key] = process.env[key]));
@@ -34,7 +32,7 @@ export const validateEnvironmentVariables = <
 >(
   serverSchema: T,
   clientSchema: K
-) => {
+): z.infer<T> & z.infer<K> => {
   let serverEnv = mapEnvironmentVariablesToObject(serverSchema);
   let clientEnv = mapEnvironmentVariablesToObject(clientSchema);
 

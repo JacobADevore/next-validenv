@@ -3,6 +3,9 @@
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
-  "extends": ["plugin:prettier/recommended"],
+  "extends": [
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
   "overrides": [{ "files": ["*.mjs", "*.ts", "*.tsx"] }]
 }

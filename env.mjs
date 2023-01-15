@@ -1,8 +1,34 @@
 // @ts-check
+import { z } from "zod";
+
+/**
+ * Specify your server-side environment variables schema here.
+ * This way you can ensure the app isn't built with invalid env vars.
+ */
+export const serverSchema = z.object({
+  NODE_ENV: z.enum(["development", "test", "production"]),
+});
+
+/**
+ * Specify your client-side environment variables schema here.
+ * This way you can ensure the app isn't built with invalid env vars.
+ * To expose them to the client, prefix them with `NEXT_PUBLIC_`.
+ */
+export const clientSchema = z.object({
+  // NEXT_PUBLIC_TEST: z.string(),
+});
+
+/**
+ * --------------------------------
+ * --------------------------------
+ * DON'T TOUCH ANYTHING BELOW THIS LINE (UNLESS YOU KNOW WHAT YOU'RE DOING)
+ * --------------------------------
+ * --------------------------------
+ */
 
 // maps through zod schema keys and returns an object with the safeParse values from process.env[key]
 export const mapEnvironmentVariablesToObject = (
-  /** @type {import('zod').ZodObject} */ schema
+  /** @type {ReturnType<typeof z.object>} */ schema
 ) => {
   /** @type {{ [key: string]: string | undefined; }} */
   let env = {};
@@ -22,18 +48,25 @@ export const formatZodErrors = (
     })
     .filter(Boolean);
 
-export const formatErrors = (/** @type string[]} */ errors) =>
+export const formatErrors = (/** @type {(string | undefined)[]} */ errors) =>
   errors.map((name) => `${name}\n`);
 
+/**
+ * @template T
+ * @template K
+ * @param {T} serverSchema
+ * @param {K} clientSchema
+ * @returns {z.infer<T> & z.infer<K>}
+ */
 export const validateEnvironmentVariables = (
-  /** @type {import('zod').ZodObject} */ clientSchema,
-  /** @type {import('zod').ZodObject} */ serverSchema
+  /** @type {ReturnType<typeof z.object>} */ serverSchema,
+  /** @type {ReturnType<typeof z.object>} */ clientSchema
 ) => {
   let serverEnv = mapEnvironmentVariablesToObject(serverSchema);
   let clientEnv = mapEnvironmentVariablesToObject(clientSchema);
 
   // holds not set environment variable errors for both client and server
-  let invalidEnvErrors = [];
+  /** @type {(string | undefined)[]} */ let invalidEnvErrors = [];
 
   if (!serverEnv.success) {
     invalidEnvErrors = [
@@ -56,7 +89,7 @@ export const validateEnvironmentVariables = (
   }
 
   // holds server environment variables errors that are exposed to the client
-  let exposedServerEnvErrors = [];
+  /** @type {(string | undefined)[]} */ let exposedServerEnvErrors = [];
 
   for (let key of Object.keys(serverEnv.data)) {
     if (key.startsWith("NEXT_PUBLIC_")) {
@@ -76,7 +109,7 @@ export const validateEnvironmentVariables = (
   }
 
   // holds client environment variables errors that are not exposed to the client
-  let notExposedClientEnvErrors = [];
+  /** @type {(string | undefined)[]} */ let notExposedClientEnvErrors = [];
 
   for (let key of Object.keys(clientEnv.data)) {
     if (!key.startsWith("NEXT_PUBLIC_")) {
@@ -96,5 +129,9 @@ export const validateEnvironmentVariables = (
   }
 
   // return both client and server environment variables
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   return { ...serverEnv.data, ...clientEnv.data };
 };
+
+export const env = validateEnvironmentVariables(serverSchema, clientSchema);
