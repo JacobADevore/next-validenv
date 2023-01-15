@@ -1,8 +1,8 @@
 {
   "name": "next-validenv",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Jacob Devore <jacob@blient.com>",
-  "description": "Environment variable validation for Next.js",
+  "description": "Typesafe environment variables for Next.js",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -20,21 +20,26 @@
     "typescript"
   ],
   "type": "module",
-  "main": "./index.mjs",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "lint": "eslint ./index.mjs --report-unused-disable-directives",
     "format": "prettier --write --plugin-search-dir=. **/*.{mjs,md,json} --ignore-path ../.gitignore",
     "format:check": "prettier --check --plugin-search-dir=. **/*.{mjs,md,json} --ignore-path ../.gitignore",
     "pub:beta": "npm publish --tag beta",
     "pub:next": "npm publish --tag next",
-    "pub:release": "npm publish"
+    "pub:release": "npm publish",
+    "build": "rollup --config rollup.config.js"
   },
   "devDependencies": {
+    "@rollup/plugin-typescript": "^11.0.0",
     "@types/node": "^18.11.18",
     "eslint": "^8.31.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.2",
+    "rollup": "^3.10.0",
+    "tslib": "^2.4.1",
     "typescript": "^4.9.4",
     "zod": "^3.20.2"
   }
