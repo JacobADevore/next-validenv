@@ -27,13 +27,30 @@
 ### Installation
 
 ```sh
-npm install zod next-validenv       # npm
-yarn add zod next-validenv          # yarn
-bun add zod next-validenv           # bun
-pnpm add zod next-validenv          # pnpm
+npm install zod next-validenv
+
+yarn add zod next-validenv
 ```
 
-### First, create `env.mjs`
+```sh
+npm install --save-dev @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint typescript
+
+yarn add --dev @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint typescript
+```
+
+### First, modify `.eslintrc.json`
+
+Append `"extends"` with `"plugin:@typescript-eslint/recommended"`
+
+```js
+{
+  "extends": ["plugin:@typescript-eslint/recommended"]
+}
+```
+
+### Create `env.mjs`
+
+Where your server and client schemas live for typesafe environment variables
 
 ```js
 //@ts-check
@@ -77,12 +94,26 @@ const config = {
 export default config;
 ```
 
-### That's it! Now you can use `env.[variable]`
+### Create `environment.d.ts`
 
 ```js
 import { env } from "./env.mjs";
 
-env.NODE_ENV; // Typesafe environment variables
+type EnvType = typeof env;
+
+export {};
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv extends EnvType, NodeJS.ProcessEnv {}
+  }
+}
+```
+
+### That's it! Now you can use `process.env` and get typesafe environment variables
+
+```js
+process.env.NODE_ENV; // Typesafe environment variables
 ```
 
 ---
