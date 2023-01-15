@@ -52,16 +52,14 @@ export const formatErrors = (/** @type {(string | undefined)[]} */ errors) =>
   errors.map((name) => `${name}\n`);
 
 /**
- * @template T
- * @template K
+ * @function
+ * @template {ReturnType<typeof z.object>} T
+ * @template {ReturnType<typeof z.object>} K
  * @param {T} serverSchema
  * @param {K} clientSchema
  * @returns {z.infer<T> & z.infer<K>}
  */
-export const validateEnvironmentVariables = (
-  /** @type {ReturnType<typeof z.object>} */ serverSchema,
-  /** @type {ReturnType<typeof z.object>} */ clientSchema
-) => {
+export const validateEnvironmentVariables = (serverSchema, clientSchema) => {
   let serverEnv = mapEnvironmentVariablesToObject(serverSchema);
   let clientEnv = mapEnvironmentVariablesToObject(clientSchema);
 
@@ -129,8 +127,6 @@ export const validateEnvironmentVariables = (
   }
 
   // return both client and server environment variables
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   return { ...serverEnv.data, ...clientEnv.data };
 };
 
