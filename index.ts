@@ -4,7 +4,7 @@ import { z } from "zod";
 export const mapEnvironmentVariablesToObject = (
   schema: ReturnType<typeof z.object>
 ) => {
-  let env: { [key: string]: string | undefined } = {};
+  const env: { [key: string]: string | undefined } = {};
 
   Object.keys(schema.shape).forEach((key) => (env[key] = process.env[key]));
 
@@ -33,8 +33,8 @@ export const validateEnvironmentVariables = <
   serverSchema: T,
   clientSchema: K
 ): z.infer<T> & z.infer<K> => {
-  let serverEnv = mapEnvironmentVariablesToObject(serverSchema);
-  let clientEnv = mapEnvironmentVariablesToObject(clientSchema);
+  const serverEnv = mapEnvironmentVariablesToObject(serverSchema);
+  const clientEnv = mapEnvironmentVariablesToObject(clientSchema);
 
   // holds not set environment variable errors for both client and server
   let invalidEnvErrors: (string | undefined)[] = [];
@@ -62,7 +62,7 @@ export const validateEnvironmentVariables = <
   // holds server environment variables errors that are exposed to the client
   let exposedServerEnvErrors: (string | undefined)[] = [];
 
-  for (let key of Object.keys(serverEnv.data)) {
+  for (const key of Object.keys(serverEnv.data)) {
     if (key.startsWith("NEXT_PUBLIC_")) {
       exposedServerEnvErrors = [...exposedServerEnvErrors, key];
     }
@@ -82,7 +82,7 @@ export const validateEnvironmentVariables = <
   // holds client environment variables errors that are not exposed to the client
   let notExposedClientEnvErrors: (string | undefined)[] = [];
 
-  for (let key of Object.keys(clientEnv.data)) {
+  for (const key of Object.keys(clientEnv.data)) {
     if (!key.startsWith("NEXT_PUBLIC_")) {
       notExposedClientEnvErrors = [...notExposedClientEnvErrors, key];
     }
