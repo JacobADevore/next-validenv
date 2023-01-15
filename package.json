@@ -1,6 +1,6 @@
 {
   "name": "next-validenv",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "author": "Jacob Devore <jacob@blient.com>",
   "description": "Typesafe environment variables for Next.js",
   "license": "MIT",
