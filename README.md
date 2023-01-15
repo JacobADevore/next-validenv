@@ -125,20 +125,63 @@ Follow the below guide to manually implement typesafe environment variables in N
 ### Installation
 
 ```sh
-npm install zod      # npm
-yarn add zod         # yarn
-bun add zod          # bun
-pnpm add zod         # pnpm
+npm install zod
+
+yarn add zod
 ```
 
-### First, create `validation.mjs`
+```sh
+npm install --save-dev @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint typescript
+
+yarn add --dev @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint typescript
+```
+
+### First, modify `.eslintrc.json`
+
+Append `"extends"` with `"plugin:@typescript-eslint/recommended"`
+
+```js
+{
+  "extends": ["plugin:@typescript-eslint/recommended"]
+}
+```
+
+### Create `env.mjs`
+
+Where your server and client schemas live for typesafe environment variables
 
 ```js
 // @ts-check
+import { z } from "zod";
+
+/**
+ * Specify your server-side environment variables schema here.
+ * This way you can ensure the app isn't built with invalid env vars.
+ */
+export const serverSchema = z.object({
+  NODE_ENV: z.enum(["development", "test", "production"]),
+});
+
+/**
+ * Specify your client-side environment variables schema here.
+ * This way you can ensure the app isn't built with invalid env vars.
+ * To expose them to the client, prefix them with `NEXT_PUBLIC_`.
+ */
+export const clientSchema = z.object({
+  // NEXT_PUBLIC_TEST: z.string(),
+});
+
+/**
+ * --------------------------------
+ * --------------------------------
+ * DON'T TOUCH ANYTHING BELOW THIS LINE (UNLESS YOU KNOW WHAT YOU'RE DOING)
+ * --------------------------------
+ * --------------------------------
+ */
 
 // maps through zod schema keys and returns an object with the safeParse values from process.env[key]
 export const mapEnvironmentVariablesToObject = (
-  /** @type {import('zod').ZodObject} */ schema
+  /** @type {ReturnType<typeof z.object>} */ schema
 ) => {
   /** @type {{ [key: string]: string | undefined; }} */
   let env = {};
@@ -158,18 +201,23 @@ export const formatZodErrors = (
     })
     .filter(Boolean);
 
-export const formatErrors = (/** @type string[]} */ errors) =>
+export const formatErrors = (/** @type {(string | undefined)[]} */ errors) =>
   errors.map((name) => `${name}\n`);
 
-export const validateEnvironmentVariables = (
-  /** @type {import('zod').ZodObject} */ clientSchema,
-  /** @type {import('zod').ZodObject} */ serverSchema
-) => {
+/**
+ * @function
+ * @template {ReturnType<typeof z.object>} T
+ * @template {ReturnType<typeof z.object>} K
+ * @param {T} serverSchema
+ * @param {K} clientSchema
+ * @returns {z.infer<T> & z.infer<K>}
+ */
+export const validateEnvironmentVariables = (serverSchema, clientSchema) => {
   let serverEnv = mapEnvironmentVariablesToObject(serverSchema);
   let clientEnv = mapEnvironmentVariablesToObject(clientSchema);
 
   // holds not set environment variable errors for both client and server
-  let invalidEnvErrors = [];
+  /** @type {(string | undefined)[]} */ let invalidEnvErrors = [];
 
   if (!serverEnv.success) {
     invalidEnvErrors = [
@@ -192,7 +240,7 @@ export const validateEnvironmentVariables = (
   }
 
   // holds server environment variables errors that are exposed to the client
-  let exposedServerEnvErrors = [];
+  /** @type {(string | undefined)[]} */ let exposedServerEnvErrors = [];
 
   for (let key of Object.keys(serverEnv.data)) {
     if (key.startsWith("NEXT_PUBLIC_")) {
@@ -212,7 +260,7 @@ export const validateEnvironmentVariables = (
   }
 
   // holds client environment variables errors that are not exposed to the client
-  let notExposedClientEnvErrors = [];
+  /** @type {(string | undefined)[]} */ let notExposedClientEnvErrors = [];
 
   for (let key of Object.keys(clientEnv.data)) {
     if (!key.startsWith("NEXT_PUBLIC_")) {
@@ -234,41 +282,11 @@ export const validateEnvironmentVariables = (
   // return both client and server environment variables
   return { ...serverEnv.data, ...clientEnv.data };
 };
+
+export const env = validateEnvironmentVariables(serverSchema, clientSchema);
 ```
 
-### Second, create `env.mjs`
-
-```js
-// @ts-check
-import { validateEnvironmentVariables } from "./validation.mjs";
-import { z } from "zod";
-
-/**
- * Specify your server-side environment variables schema here.
- * This way you can ensure the app isn't built with invalid env vars.
- */
-export const serverSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]),
-});
-
-/**
- * Specify your client-side environment variables schema here.
- * This way you can ensure the app isn't built with invalid env vars.
- * To expose them to the client, prefix them with `NEXT_PUBLIC_`.
- */
-export const clientSchema = z.object({
-  // NEXT_PUBLIC_CLIENT: z.string(),
-});
-
-const environmentVariables = validateEnvironmentVariables(
-  clientSchema,
-  serverSchema
-);
-
-export const env = environmentVariables;
-```
-
-### Third, update ~~`next.config.js`~~ to `next.config.mjs`
+### Update ~~`next.config.js`~~ to `next.config.mjs`
 
 ```js
 // @ts-check
@@ -285,10 +303,24 @@ const config = {
 export default config;
 ```
 
-### That's it! Now you can use `env.[variable]`
+### Create `environment.d.ts`
 
 ```js
 import { env } from "./env.mjs";
 
-env.NODE_ENV; // Typesafe environment variables
+type EnvType = typeof env;
+
+export {};
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv extends EnvType, NodeJS.ProcessEnv {}
+  }
+}
+```
+
+### That's it! Now you can use `process.env` and get typesafe environment variables
+
+```js
+process.env.NODE_ENV; // Typesafe environment variables
 ```
