@@ -12,9 +12,12 @@ export const formatZodErrors = (
     })
     .filter(Boolean);
 
-export const validateEnvironmentVariables = (
-  schema: ReturnType<typeof z.object>,
-  unparsedEnv: object
+export const validateEnvironmentVariables = <
+  T extends ReturnType<typeof z.object>,
+  K extends { [k in keyof z.infer<T>]: z.infer<T>[k] | undefined }
+>(
+  schema: T,
+  unparsedEnv: K
 ) => {
   const env = schema.safeParse(unparsedEnv);
 
