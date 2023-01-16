@@ -14,7 +14,7 @@ export const formatZodErrors = (
 
 export const validateEnvironmentVariables = <
   T extends ReturnType<typeof z.object>,
-  K extends { [k in keyof z.infer<T>]: z.infer<T>[k] | undefined }
+  K
 >(
   schema: T,
   unparsedEnv: K
